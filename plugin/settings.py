@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
-
+# @Author: Bi Ying
+# @Date:   2022-08-02 20:03:15
+# @Last Modified by:   Bi Ying
+# @Last Modified time: 2022-08-03 01:11:58
 import os
 from pathlib import Path
 
@@ -17,14 +19,14 @@ if dotenv_path.exists():
 
 # The default value can work, if no user config.
 CONFIG = os.getenv("CONFIG", "default config")
-LOCAL = os.getenv("local", "en")
+LOCAL = os.getenv("local", "zh")
 
 
 # the information of package
-__package_name__ = "Flow.Launcher.Plugin.DirectTranslate"
-__version__ = "2.1.0"
-__short_description__ = "Translate between any languages supported by Googletrans"
-GITHUB_USERNAME = "Drimix20"
+__package_name__ = "YoudaoTranslate"
+__version__ = "1.0.0"
+__short_description__ = "Translate between any languages supported by Youdao"
+GITHUB_USERNAME = "AndersonBY"
 
 
 readme_path = basedir / "README.md"
@@ -38,15 +40,13 @@ except:
 TRANSLATIONS_PATH = basedir / "plugin/translations"
 
 # plugin.json
-PLUGIN_ID = "1b7c732781f94b748ed08351f8200894"
+PLUGIN_ID = "6f831f62789e4b1c9b06af149f063958"
 ICON_PATH = "assets/favicon.ico"
-PLUGIN_AUTHOR = "Drimix20"
-PLUGIN_ACTION_KEYWORD = "tr"
+PLUGIN_AUTHOR = "AndersonBY"
+PLUGIN_ACTION_KEYWORD = "yd"
 PLUGIN_PROGRAM_LANG = "python"
 PLUGIN_EXECUTE_FILENAME = "main.py"
 PLUGIN_ZIP_NAME = f"{__package_name__}-{__version__}.zip"
-PLUGIN_URL = f"https://github.com/{GITHUB_USERNAME}/{__package_name__}"
-PLUGIN_URL_SOURCE_CODE = f"https://github.com/{GITHUB_USERNAME}/{__package_name__}"
-PLUGIN_URL_DOWNLOAD = (
-    f"{PLUGIN_URL_SOURCE_CODE}/releases/download/v{__version__}/{PLUGIN_ZIP_NAME}"
-)
+PLUGIN_URL = "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate"
+PLUGIN_URL_SOURCE_CODE = "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate"
+PLUGIN_URL_DOWNLOAD = f"{PLUGIN_URL_SOURCE_CODE}/releases/download/v{__version__}/{PLUGIN_ZIP_NAME}"

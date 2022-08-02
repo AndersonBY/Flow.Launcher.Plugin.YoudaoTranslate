@@ -1,0 +1,15 @@
+# @Author: Bi Ying
+# @Date:   2022-08-02 21:28:02
+# @Last Modified by:   Bi Ying
+# @Last Modified time: 2022-08-02 21:30:45
+body:
+  - type: input
+    attributes:
+      name: youdao_app_id
+      label: 'App ID:'
+      description: App ID of youdao ai app
+  - type: input
+    attributes:
+      name: youdao_app_secrect
+      label: 'App Secret:'
+      description: App Secret of youdao ai app

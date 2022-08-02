@@ -1,13 +1,13 @@
-# Direct Translate (Flow.Launcher.Plugin.DirectTranslate)
+# Youdao Translate (Flow.Launcher.Plugin.YoudaoTranslate)
 
-Translate plugin that translates between any languages supported by python googletrans library for [Flow Launcher](https://github.com/Flow-Launcher/Flow.Launcher).
+Translate plugin that translates between any languages supported by youdao for [Flow Launcher](https://github.com/Flow-Launcher/Flow.Launcher).
 
 ![Translate](https://i.imgur.com/mVxnBk1.gif)
 
 #### About
 
 
-Plugin uses [googletrans](https://github.com/ssut/py-googletrans) to translate between any supported languages.
+Plugin uses [youdaoai](https://github.com/AndersonBY/python-youdao-ai) to translate between any supported languages.
 
 
 ### Requirements
@@ -23,7 +23,7 @@ Use the `pm install` command from within Flow itself.
 
 #### Manual
 
-Add the Flow.Launcher.Plugin.DirectTranslate directory to %APPDATA%\Roaming\FlowLauncher\Plugins\ and restart Flow.
+Add the Flow.Launcher.Plugin.YoudaoTranslate directory to %APPDATA%\Roaming\FlowLauncher\Plugins\ and restart Flow.
 
 #### Python Package Requirements
 
@@ -31,7 +31,7 @@ There is no requirement to install the packages as they will be packed with the 
 
 If you still want to manually pip install them:
 
-The `requirements.txt` file in this repo outlines which packages are needed. This can be found online here on Github, as well as in the local plugin directory once installed (%APPDATA%\Roaming\FlowLauncher\Plugins\Direct Translate-X.X.X\ where X.X.X is the currently installed version)
+The `requirements.txt` file in this repo outlines which packages are needed. This can be found online here on Github, as well as in the local plugin directory once installed (%APPDATA%\Roaming\FlowLauncher\Plugins\YoudaoTranslate-X.X.X\ where X.X.X is the currently installed version)
 
 The easiest way to manually install these packages is to use the following command in a Windows Command Prompt or Powershell Prompt
 
@@ -43,15 +43,15 @@ Remember you need to be in the local directory containing the requirements text 
 
 | Keyword                                                          | Description                                 |
 | ---------------------------------------------------------------- | ------------------------------------------- |
-| `tr {from language} {to language} {words to be translated}` | Translate `words to be translated` from `from language` to `to language` language. Example of usage is `tr en cs hello world` |
+| `yd {from language} {to language} {words to be translated}` | Translate `words to be translated` from `from language` to `to language` language. Example of usage is `yd en cs hello world` |
 
 Alternatively:
-- if you do no supply any language code, your input language will be auto-detected as 'from language' and your 'to language' will be your computer system default language, e.g. `tr mattina`.
-- if you just supply one language code, this will be used as the 'to language' and your input will be auto-detected as the 'from language', e.g. `tr it morning`
+- if you do no supply any language code, your input language will be auto-detected between English and your computer system default language , e.g. `yd 你好`.
+- if you just supply one language code, this will be used as the 'to language' and your input will be auto-detected as the 'from language', e.g. `yd ru 你好`
 
 **Full list of supported language codes:**
 
-https://developers.google.com/admin-sdk/directory/v1/languages
+https://ai.youdao.com/DOCSIRMA/html/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E7%BF%BB%E8%AF%91/API%E6%96%87%E6%A1%A3/%E6%96%87%E6%9C%AC%E7%BF%BB%E8%AF%91%E6%9C%8D%E5%8A%A1/%E6%96%87%E6%9C%AC%E7%BF%BB%E8%AF%91%E6%9C%8D%E5%8A%A1-API%E6%96%87%E6%A1%A3.html
 
 ### Problems, errors and feature requests
 

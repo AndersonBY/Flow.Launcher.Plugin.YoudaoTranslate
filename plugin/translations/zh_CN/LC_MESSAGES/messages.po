@@ -20,7 +20,7 @@ msgstr ""
 
 #: plugin/ui.py:62
 msgid "invalid destination language"
-msgstr "无效目的地语言"
+msgstr "无效目标语言"
 
 #: plugin/ui.py:62
 msgid "invalid source language"
@@ -28,4 +28,4 @@ msgstr "无效源语言"
 
 #: plugin/ui.py:47
 msgid "<Hotkey> <From Language> <To Language> <Text>"
-msgstr "<热键> <從語言> <語言> <文本>"
+msgstr "<热键> <源语言> <目标语言> <文本>"

@@ -1,4 +1,4 @@
-flowlauncher
+flox-lib
 python-dotenv
 typing
-googletrans==3.1.0a0
+youdaoai
