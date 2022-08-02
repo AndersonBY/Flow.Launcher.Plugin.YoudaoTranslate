@@ -2,7 +2,7 @@
 
 Translate plugin that translates between any languages supported by youdao for [Flow Launcher](https://github.com/Flow-Launcher/Flow.Launcher).
 
-![Translate](https://i.imgur.com/mVxnBk1.gif)
+![Translate](https://i.imgur.com/QiX5Q1o.gif)
 
 #### About
 
