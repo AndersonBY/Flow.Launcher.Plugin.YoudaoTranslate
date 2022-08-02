@@ -1,7 +1,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 01:45:01
+# @Last Modified time: 2022-08-03 01:49:25
 name: Build and Publish
 
 on:
@@ -44,7 +44,7 @@ jobs:
           pip install -r ./requirements.txt
 
       - name: Install Dependencies to Local
-        run: python commands.py setup-env-to-lib
+        run: pip install -r ./requirements.txt -t ./lib
 
       - name: Compile all languages
         run: python commands.py compile
