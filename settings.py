@@ -2,7 +2,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 02:08:58
+# @Last Modified time: 2022-08-03 02:32:42
 import os
 from pathlib import Path
 
@@ -50,4 +50,6 @@ PLUGIN_EXECUTE_FILENAME = "main.py"
 PLUGIN_ZIP_NAME = f"{__package_name__}-{__version__}.zip"
 PLUGIN_URL = "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate"
 PLUGIN_URL_SOURCE_CODE = "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate"
-PLUGIN_URL_DOWNLOAD = f"{PLUGIN_URL_SOURCE_CODE}/releases/download/v{__version__}/{PLUGIN_ZIP_NAME}"
+PLUGIN_URL_DOWNLOAD = (
+    f"{PLUGIN_URL_SOURCE_CODE}/releases/download/v{__version__}/Flow.Launcher.Plugin.YoudaoTranslate.zip"
+)
