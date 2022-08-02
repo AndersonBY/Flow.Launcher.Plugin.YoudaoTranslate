@@ -1,7 +1,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 01:40:41
+# @Last Modified time: 2022-08-03 01:45:01
 name: Build and Publish
 
 on:
@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wheel
+          pip install wheel click babel
           pip install -r ./requirements.txt
 
       - name: Install Dependencies to Local
