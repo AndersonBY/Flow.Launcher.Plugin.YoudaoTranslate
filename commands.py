@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-
+# @Author: Bi Ying
+# @Date:   2022-08-02 20:03:15
+# @Last Modified by:   Bi Ying
+# @Last Modified time: 2022-08-03 02:08:20
 import json
 import os
 from textwrap import dedent
@@ -7,7 +10,7 @@ from typing import List
 
 import click
 
-from plugin import (
+from settings import (
     ICON_PATH,
     PLUGIN_ACTION_KEYWORD,
     PLUGIN_AUTHOR,
@@ -23,20 +26,20 @@ from plugin import (
     __package_name__,
     __short_description__,
     __version__,
-    basedir,
+    base_dir,
 )
 
 # constants
 # folder
-build_path = basedir / "build"
+build_path = base_dir / "build"
 build_path.mkdir(exist_ok=True)
-lib_path = basedir / "lib"
+lib_path = base_dir / "lib"
 lib_path.mkdir(exist_ok=True)
 
 # file
-build_ignore_path = basedir / ".buildignore"
+build_ignore_path = base_dir / ".buildignore"
 build_ignore_path.touch()  # if no existed, would be created
-plugin_info_path = basedir / "plugin.json"
+plugin_info_path = base_dir / "plugin.json"
 zip_path = build_path / f"{PLUGIN_ZIP_NAME}"
 
 plugin_infos = {
@@ -78,13 +81,13 @@ def hook_env_snippet(exec_file: str = PLUGIN_EXECUTE_FILENAME) -> str:
     import os
     import sys
 
-    basedir = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(basedir, "{lib_path.name}"))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(base_dir, "{lib_path.name}"))
     """
     )
 
     temp_path = build_path / exec_file
-    entry_src = basedir / exec_file
+    entry_src = base_dir / exec_file
     with open(entry_src, "r") as f_r:
         with open(temp_path, "w") as f_w:
             f_w.write(env_snippet + f_r.read())
@@ -212,9 +215,9 @@ def clean_build():
 def clean_pyc():
     "Remove Python file artifacts"
 
-    os.system(f"find {basedir} -name '*.pyc' -exec rm -f {{}} +")
-    os.system(f"find {basedir} -name '*.pyo' -exec rm -f {{}} +")
-    os.system(f"find {basedir} -name '*~' -exec rm -f {{}} +")
+    os.system(f"find {base_dir} -name '*.pyc' -exec rm -f {{}} +")
+    os.system(f"find {base_dir} -name '*.pyo' -exec rm -f {{}} +")
+    os.system(f"find {base_dir} -name '*~' -exec rm -f {{}} +")
 
     click.echo("Done.")
 
