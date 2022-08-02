@@ -2,7 +2,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 02:32:42
+# @Last Modified time: 2022-08-03 02:41:51
 import os
 from pathlib import Path
 
@@ -43,6 +43,9 @@ TRANSLATIONS_PATH = base_dir / "plugin/translations"
 # plugin.json
 PLUGIN_ID = "6f831f62789e4b1c9b06af149f063958"
 ICON_PATH = "assets/favicon.ico"
+PLUGIN_ICON_PATH = (
+    "https://cdn.jsdelivr.net/gh/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate@master/assets/favicon.ico"
+)
 PLUGIN_AUTHOR = "AndersonBY"
 PLUGIN_ACTION_KEYWORD = "yd"
 PLUGIN_PROGRAM_LANG = "python"

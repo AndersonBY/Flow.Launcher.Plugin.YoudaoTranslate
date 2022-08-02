@@ -2,7 +2,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 02:08:20
+# @Last Modified time: 2022-08-03 02:39:45
 import json
 import os
 from textwrap import dedent
@@ -12,6 +12,7 @@ import click
 
 from settings import (
     ICON_PATH,
+    PLUGIN_ICON_PATH,
     PLUGIN_ACTION_KEYWORD,
     PLUGIN_AUTHOR,
     PLUGIN_EXECUTE_FILENAME,
@@ -51,7 +52,7 @@ plugin_infos = {
     "Version": __version__,
     "Language": PLUGIN_PROGRAM_LANG,
     "Website": PLUGIN_URL,
-    "IcoPath": ICON_PATH,
+    "IcoPath": PLUGIN_ICON_PATH,
     "ExecuteFileName": PLUGIN_EXECUTE_FILENAME,
     "UrlDownload": PLUGIN_URL_DOWNLOAD,
     "UrlSourceCode": PLUGIN_URL_SOURCE_CODE,
