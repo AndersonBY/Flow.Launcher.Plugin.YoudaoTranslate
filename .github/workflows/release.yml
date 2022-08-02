@@ -1,7 +1,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 01:49:25
+# @Last Modified time: 2022-08-03 01:53:01
 name: Build and Publish
 
 on:
@@ -45,9 +45,6 @@ jobs:
 
       - name: Install Dependencies to Local
         run: pip install -r ./requirements.txt -t ./lib
-
-      - name: Compile all languages
-        run: python commands.py compile
 
       - name: Update 'plugin.json' information
         run: python commands.py gen-plugin-info
