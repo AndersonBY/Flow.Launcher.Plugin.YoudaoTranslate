@@ -1,7 +1,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 02:25:58
+# @Last Modified time: 2022-08-03 12:07:47
 name: Build and Publish
 
 on:
@@ -62,18 +62,6 @@ jobs:
           path: 'plugin.json'
           prop_path: 'Version'
       - run: echo ${{ steps.version.outputs.prop }} 
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          # This token is provided by Actions
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.prop }}
-          release_name: ${{ steps.version.outputs.prop }}
-          draft: true
-          prerelease: false
 
       - name: Package files
         run: |
