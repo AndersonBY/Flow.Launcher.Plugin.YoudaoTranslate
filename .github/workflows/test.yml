@@ -1,3 +1,7 @@
+# @Author: Bi Ying
+# @Date:   2022-08-05 04:03:52
+# @Last Modified by:   Bi Ying
+# @Last Modified time: 2022-08-05 04:14:52
 name: "Test Plugin"
 on:
   pull_request: 
@@ -35,7 +39,7 @@ jobs:
       - name: Assert Version updated
         if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          $release_ver = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{github.repository}}/main/plugin.json" | ConvertFrom-Json).Version
+          $release_ver = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{github.repository}}/master/plugin.json" | ConvertFrom-Json).Version
           $release_ver = $release_ver -replace "v", "" 
           $this_ver = "${{steps.version.outputs.prop}}"
           echo "This version:" $this_ver
