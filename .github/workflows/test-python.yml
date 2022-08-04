@@ -1,6 +1,10 @@
+# @Author: Bi Ying
+# @Date:   2022-08-05 03:31:53
+# @Last Modified by:   Bi Ying
+# @Last Modified time: 2022-08-05 03:36:35
 name: Test run Python plugins
 on:
-  pull_request
+  workflow_dispatch:
 jobs:
   skip_check_job:
     runs-on: ubuntu-latest
