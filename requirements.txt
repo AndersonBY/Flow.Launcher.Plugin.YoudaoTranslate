@@ -2,3 +2,4 @@ flox-lib
 python-dotenv
 typing
 youdaoai
+requests[use_chardet_on_py3]==2.27.1
