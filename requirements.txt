@@ -2,4 +2,6 @@ flox-lib
 python-dotenv
 typing
 youdaoai
+chardet
+charset_normalizer
 requests[use_chardet_on_py3]==2.27.1
