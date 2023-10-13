@@ -2,7 +2,7 @@
 # @Author: Bi Ying
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 01:02:09
+# @Last Modified time: 2023-10-13 15:13:12
 import re
 from typing import List
 
@@ -132,9 +132,7 @@ LANGUAGES = [
 ]
 
 
-class Main(Flox):
-    items = []
-
+class YoudaoTranslate(Flox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.youdao_app_id = self.settings.get("youdao_app_id")
@@ -185,11 +183,9 @@ class Main(Flox):
                         self.add_item(",".join(web_explain["value"]), f"网络释义: {web_explain['key']}", ICON_PATH)
         except Exception as error:
             self.add_item(_(str(error)), f"{src} → {dest}   {query}")
-        return self.items
 
     def help_action(self):
         self.add_item("youdao translate", _("<hotkey> <from language> <to language> <text>"))
-        return self.items
 
     def query(self, query_text: str = "") -> List[dict]:
         params = query_text.strip().lower().split(" ")
