@@ -1,0 +1,22 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Anderson", email = "andersonby@163.com"},
+]
+dependencies = [
+    "youdaoai",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm.scripts]
+build = "python build.py -v 0.0.29 -t p"
