@@ -1,5 +1,5 @@
 import logging
-from subprocess import Popen, PIPE, CREATE_NO_WINDOW
+from subprocess import Popen, CREATE_NO_WINDOW
 import webbrowser
 from winreg import OpenKey, QueryValueEx, HKEY_CURRENT_USER as HKCU, HKEY_LOCAL_MACHINE as HKLM
 
@@ -59,7 +59,7 @@ class Browser(object):
             log.debug(f'Opening {url} with {cmd}')
             Popen(cmd, creationflags=CREATE_NO_WINDOW)
         # All else fails, open in default browser and log error
-        except Exception as e:
+        except Exception:
             log.exception(f'Can\'t open {url} with {self.Name}')
             webbrowser.open(url)
 

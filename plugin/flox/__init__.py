@@ -3,20 +3,18 @@
 # @Date:   2023-10-13 00:50:31
 # @Last Modified by:   Bi Ying
 # @Last Modified time: 2023-10-13 15:56:48
-import sys
 import traceback
 import os
 import json
 import time
 import webbrowser
-import urllib.parse
 from datetime import date
 import logging
 import logging.handlers
+from collections.abc import Callable
 from pathlib import Path
-from typing import Union
-from functools import wraps, cached_property
-from tempfile import gettempdir
+from typing import Any
+from functools import cached_property
 
 from .launcher import Launcher
 from .browser import Browser
@@ -30,8 +28,8 @@ FLOW_API = "Flow.Launcher"
 WOX_API = "Wox"
 APP_DIR = None
 USER_DIR = None
-LOCALAPPDATA = Path(os.getenv("LOCALAPPDATA"))
-APPDATA = Path(os.getenv("APPDATA"))
+LOCALAPPDATA = Path(os.getenv("LOCALAPPDATA") or Path.home() / "AppData" / "Local")
+APPDATA = Path(os.getenv("APPDATA") or Path.home() / "AppData" / "Roaming")
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 CURRENT_WORKING_DIR = Path().cwd()
 LAUNCHER_NOT_FOUND_MSG = (
@@ -42,7 +40,6 @@ LAUNCHER_NOT_FOUND_MSG = (
 
 
 launcher_dir = None
-# path = CURRENT_WORKING_DIR
 path = Path(__file__)
 if SCOOP_FLOW_LAUNCHER_DIR_NAME.lower() in str(path).lower():
     launcher_name = SCOOP_FLOW_LAUNCHER_DIR_NAME
@@ -54,11 +51,12 @@ elif WOX_DIR_NAME.lower() in str(path).lower():
     launcher_name = WOX_DIR_NAME
     API = WOX_API
 else:
-    raise FileNotFoundError(LAUNCHER_NOT_FOUND_MSG)
+    launcher_name = FLOW_LAUNCHER_DIR_NAME
+    API = FLOW_API
 
-while True:
+while APP_DIR is None or USER_DIR is None:
     if len(path.parts) == 1:
-        raise FileNotFoundError(LAUNCHER_NOT_FOUND_MSG)
+        break
     if path.joinpath("Settings").exists():
         USER_DIR = path
         if USER_DIR.name == "UserData":
@@ -66,13 +64,13 @@ while True:
         elif str(path).startswith(str(APPDATA)):
             APP_DIR = LOCALAPPDATA.joinpath(launcher_name)
         else:
-            raise FileNotFoundError(LAUNCHER_NOT_FOUND_MSG)
+            APP_DIR = LOCALAPPDATA.joinpath(launcher_name)
         break
 
     path = path.parent
 
-USER_DIR = LOCALAPPDATA / "FlowLauncher"
-APP_DIR = APPDATA / "FlowLauncher"
+USER_DIR = USER_DIR or APPDATA / "FlowLauncher"
+APP_DIR = APP_DIR or LOCALAPPDATA / "FlowLauncher"
 PLUGIN_DIR = Path(__file__).parent.parent.parent
 
 APP_ICONS = APP_DIR.joinpath("Images")
@@ -120,16 +118,19 @@ ICON_WORK = APP_DIR.joinpath("work.png")
 
 class Flox(Launcher):
     def __init_subclass__(cls, api=API, app_dir=APP_DIR, user_dir=USER_DIR):
-        cls._debug = False
         cls.appdir = APP_DIR
         cls.user_dir = USER_DIR
         cls.api = api
-        cls._start = time.time()
-        cls._results = []
-        cls._settings = None
         cls.font_family = "/Resources/#Segoe Fluent Icons"
         cls.issue_item_title = "Report Issue"
         cls.issue_item_subtitle = "Report this issue to the developer"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._debug = False
+        self._start = time.time()
+        self._results = []
+        self._settings = None
 
     @cached_property
     def browser(self):
@@ -177,17 +178,17 @@ class Flox(Launcher):
         self,
         title: str,
         subtitle: str = "",
-        icon: str = None,
-        method: Union[str, callable] = None,
-        parameters: list = None,
-        context: list = None,
-        glyph: str = None,
+        icon: str | os.PathLike[str] | None = None,
+        method: str | Callable[..., Any] | None = None,
+        parameters: list[Any] | None = None,
+        context: Any = None,
+        glyph: str | None = None,
         score: int = 0,
         **kwargs,
     ):
         icon = icon or self.icon
         if not Path(icon).is_absolute():
-            icon = Path(self.plugindir, icon)
+            icon = str(Path(self.plugindir, icon))
         item = {
             "Title": str(title),
             "SubTitle": str(subtitle),
@@ -217,17 +218,23 @@ class Flox(Launcher):
 
     @cached_property
     def plugindir(self):
-        return str(PLUGIN_DIR)
-        potential_paths = [os.path.abspath(os.getcwd()), os.path.dirname(os.path.abspath(os.path.dirname(__file__)))]
+        potential_paths = [
+            Path.cwd(),
+            Path(__file__).resolve().parent,
+            PLUGIN_DIR,
+        ]
 
-        for path in potential_paths:
+        for potential_path in potential_paths:
+            path = Path(potential_path).resolve()
             while True:
-                if os.path.exists(os.path.join(path, PLUGIN_MANIFEST)):
-                    return path
-                elif os.path.ismount(path):
-                    return os.getcwd()
+                if path.joinpath(PLUGIN_MANIFEST).exists():
+                    return str(path)
+                if path.parent == path:
+                    break
 
-                path = os.path.dirname(path)
+                path = path.parent
+
+        return str(PLUGIN_DIR)
 
     @cached_property
     def manifest(self):
@@ -244,6 +251,9 @@ class Flox(Launcher):
 
     @cached_property
     def action_keyword(self):
+        action_keywords = self.manifest.get("ActionKeywords")
+        if action_keywords:
+            return action_keywords[0]
         return self.manifest["ActionKeyword"]
 
     @cached_property
@@ -252,13 +262,16 @@ class Flox(Launcher):
 
     @cached_property
     def appdata(self):
-        # Userdata should be up two directories from plugin root
-        return os.path.dirname(os.path.dirname(self.plugindir))
+        return str(self.user_dir)
 
     @property
     def app_settings(self):
-        with open(os.path.join(self.appdata, "Settings", "Settings.json"), "r", encoding="utf-8") as f:
-            return json.load(f)
+        settings_file = os.path.join(self.appdata, "Settings", "Settings.json")
+        try:
+            with open(settings_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {}
 
     @property
     def query_search_precision(self):
@@ -266,17 +279,18 @@ class Flox(Launcher):
 
     @cached_property
     def user_keywords(self):
-        return (
-            self.app_settings["PluginSettings"]["Plugins"].get(self.id, {}).get("UserKeywords", [self.action_keyword])
-        )
+        plugin_settings = self.app_settings.get("PluginSettings", {}).get("Plugins", {}).get(self.id, {})
+        keywords = plugin_settings.get("ActionKeywords") or plugin_settings.get("UserKeywords")
+        if keywords:
+            return keywords
+        return self.manifest.get("ActionKeywords") or [self.action_keyword]
 
     @cached_property
     def user_keyword(self):
         return self.user_keywords[0]
 
-    @cached_property
     def appicon(self, icon):
-        return os.path.join(self.appdir, "images", icon + ".png")
+        return os.path.join(str(self.appdir), "images", icon + ".png")
 
     @property
     def applog(self):
@@ -286,7 +300,7 @@ class Flox(Launcher):
 
     @cached_property
     def appversion(self):
-        return os.path.basename(self.appdir).replace("app-", "")
+        return os.path.basename(str(self.appdir)).replace("app-", "")
 
     @cached_property
     def logfile(self):
@@ -295,12 +309,22 @@ class Flox(Launcher):
 
     @cached_property
     def logger(self):
-        logger = logging.getLogger("")
+        logger = logging.getLogger(self.id)
         formatter = logging.Formatter("%(asctime)s %(levelname)s (%(filename)s): %(message)s", datefmt="%H:%M:%S")
-        logfile = logging.handlers.RotatingFileHandler(self.logfile, maxBytes=1024 * 2024, backupCount=1)
-        logfile.setFormatter(formatter)
-        logger.addHandler(logfile)
+        for handler in logger.handlers:
+            if getattr(handler, "baseFilename", None) == self.logfile:
+                break
+        else:
+            logfile = logging.handlers.RotatingFileHandler(
+                self.logfile,
+                maxBytes=1024 * 2024,
+                backupCount=1,
+                encoding="utf-8",
+            )
+            logfile.setFormatter(formatter)
+            logger.addHandler(logfile)
         logger.setLevel(logging.WARNING)
+        logger.propagate = False
         return logger
 
     def logger_level(self, level):
@@ -314,14 +338,6 @@ class Flox(Launcher):
             self.logger.setLevel(logging.ERROR)
         elif level == "critical":
             self.logger.setLevel(logging.CRITICAL)
-
-    @cached_property
-    def api(self):
-        launcher = os.path.basename(os.path.dirname(self.appdir))
-        if launcher == "FlowLauncher":
-            return FLOW_API
-        else:
-            return WOX_API
 
     @cached_property
     def name(self):
@@ -339,8 +355,9 @@ class Flox(Launcher):
 
     @cached_property
     def settings(self):
-        if not os.path.exists(os.path.dirname(self.settings_path)):
-            os.mkdir(os.path.dirname(self.settings_path))
+        if self._settings is not None:
+            return self._settings
+        os.makedirs(os.path.dirname(self.settings_path), exist_ok=True)
         return Settings(self.settings_path)
 
     def browser_open(self, url):
@@ -348,7 +365,8 @@ class Flox(Launcher):
 
     @cached_property
     def python_dir(self):
-        return self.app_settings["PluginSettings"]["PythonDirectory"]
+        plugin_settings = self.app_settings.get("PluginSettings", {})
+        return plugin_settings.get("PythonExecutablePath") or plugin_settings.get("PythonDirectory")
 
     def log(self):
         return self.logger

@@ -21,7 +21,7 @@ class MatchData:
     matched: bool
     score_cutoff: int
     index_list: List[int] = field(default_factory=list)
-    score: int = 0
+    score: float = 0
 
 
 def string_matcher(query: str, text: str, ignore_case: bool = True, query_search_precision: int = DEFAULT_QUERY_SEARCH_PRECISION) -> MatchData:
@@ -115,7 +115,7 @@ def string_matcher(query: str, text: str, ignore_case: bool = True, query_search
             current_query_substring_char_index = 0
 
     if acronyms_matched > 0 and acronyms_matched == len(query):
-        acronyms_score: int = acronyms_matched * 100 / acronyms_total_count
+        acronyms_score: float = acronyms_matched * 100 / acronyms_total_count
 
         if acronyms_score >= query_search_precision:
             return MatchData(True, query_search_precision, acronym_match_data, acronyms_score)

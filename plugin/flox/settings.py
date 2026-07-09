@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import os
 
 class Settings(dict):
 
@@ -17,7 +18,7 @@ class Settings(dict):
         
     def _load(self):
         data = {}
-        with open(self._filepath, 'r') as f:
+        with open(self._filepath, 'r', encoding='utf-8') as f:
             try:
                 data.update(json.load(f))
             except json.decoder.JSONDecodeError:
@@ -31,8 +32,12 @@ class Settings(dict):
         if self._save:
             data = {}
             data.update(self)
-            with open(self._filepath, 'w') as f:
-                json.dump(data, f, sort_keys=True, indent=4)
+            path = Path(self._filepath)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            temp_path = path.with_suffix(path.suffix + '.tmp')
+            with open(temp_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, sort_keys=True, indent=4, ensure_ascii=False)
+            os.replace(temp_path, path)
         return
     
     def __setitem__(self, key, value):

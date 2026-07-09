@@ -7,10 +7,9 @@ import json
 import os
 from time import time
 import socket
-from concurrent.futures import ThreadPoolExecutor
 import logging
 
-logging = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 URL_SCHEMA = [
     'http://',
@@ -33,7 +32,7 @@ def cache(file_name:str, max_age=30, dir=gettempdir()):
                     try:
                         cache = json.load(f)
                     except json.JSONDecodeError:
-                        logging.warning('Unable to read cache file: %s', cache_file)
+                        log.warning('Unable to read cache file: %s', cache_file)
                         f.close()
                         os.remove(cache_file)
                     else:
@@ -45,7 +44,7 @@ def cache(file_name:str, max_age=30, dir=gettempdir()):
                 try:
                     write_json(data, cache_file)
                 except FileNotFoundError:
-                    logging.warning('Unable to write cache file: %s', cache_file)
+                    log.warning('Unable to write cache file: %s', cache_file)
             return data
         return wrapper
     return decorator
@@ -55,7 +54,7 @@ def read_json(path:str):
     Read json file
     """
     with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        return json.load(f)
 
 def write_json(data, path):
     if not Path(path).parent.exists():
@@ -111,11 +110,11 @@ def download_file(url:str, path, **kwargs):
         return
     try:
         request.urlretrieve(url, path)
-    except URLError as e:
-        logging.exception(f'Unable to download: {url}')
+    except URLError:
+        log.exception(f'Unable to download: {url}')
     return Path(path)
 
-def get_icon(url:str, path, file_name:str=None, **kwargs):
+def get_icon(url: str, path, file_name: str | None = None, **kwargs):
     for schema in URL_SCHEMA:
         if url.startswith(schema):
             break

@@ -8,7 +8,7 @@ body:
       name: youdao_app_id
       label: 'App ID:'
       description: App ID of youdao ai app
-  - type: input
+  - type: passwordBox
     attributes:
       name: youdao_app_secrect
       label: 'App Secret:'

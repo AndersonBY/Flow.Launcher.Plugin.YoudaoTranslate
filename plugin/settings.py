@@ -16,4 +16,4 @@ CONFIG = os.getenv("CONFIG", "default config")
 LOCAL = os.getenv("local", "zh")
 
 TRANSLATIONS_PATH = basedir / "translations"
-ICON_PATH = basedir / "assets" / "favicon.ico"
+ICON_PATH = "assets/favicon.ico"

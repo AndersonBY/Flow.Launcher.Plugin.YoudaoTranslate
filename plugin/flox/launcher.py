@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import sys
+from typing import Any, cast
 from time import time
 
 """
@@ -11,13 +12,23 @@ class Launcher(object):
     """
     Launcher python plugin base
     """
+    api: str
+    logger: Any
+    settings: Any
+    _debug: bool
+    _results: list[Any]
+    _settings: Any
+    _start: float
+
+    def logger_level(self, level):
+        pass
 
     def run(self, debug=None):
         if debug:
             self._debug = debug
         self.rpc_request = {'method': 'query', 'parameters': ['']}
         if len(sys.argv) > 1:
-            self.rpc_request = json.loads(sys.argv[1])
+            self.rpc_request = cast(dict[str, Any], json.loads(sys.argv[1]))
         if 'settings' in self.rpc_request.keys():
             self._settings = self.rpc_request['settings']
             self.logger.debug('Loaded settings from RPC request')
@@ -29,15 +40,19 @@ class Launcher(object):
         self.logger.debug(f"Params: {self.rpc_request.get('parameters')}")
         # proxy is not working now
         # self.proxy = rpc_request.get("proxy",{})
-        request_method_name = self.rpc_request.get("method")
+        request_method_name = self.rpc_request.get("method", "query")
+        if not isinstance(request_method_name, str):
+            request_method_name = "query"
         #transform query and context calls to internal flox methods
         if request_method_name == 'query' or request_method_name == 'context_menu':
             request_method_name = f"_{request_method_name}"
 
         request_parameters = self.rpc_request.get("parameters")
+        if not isinstance(request_parameters, list):
+            request_parameters = []
 
-        request_method = getattr(self, request_method_name)
         try:
+            request_method = getattr(self, request_method_name)
             results = request_method(*request_parameters) or self._results
         except Exception as e:
             self.logger.exception(e)
@@ -47,7 +62,7 @@ class Launcher(object):
         self.logger.debug(f'{line_break} Total time: {ms}ms {line_break}')
         if request_method_name == "_query" or request_method_name == "_context_menu":
             results = {"result": results}
-            if self._settings != self.rpc_request.get('Settings') and self._settings is not None:
+            if self._settings != self.rpc_request.get('settings') and self._settings is not None:
                 results['SettingsChange'] = self.settings
 
             print(json.dumps(results))

@@ -3,31 +3,29 @@
 # @Date:   2023-05-15 13:34:28
 # @Last Modified by:   Bi Ying
 # @Last Modified time: 2023-10-13 15:50:13
-import os
-import shlex
 import shutil
 import argparse
 import subprocess
 from pathlib import Path
 
 
-def run_cmd(cmd: str, split=False):
+def run_cmd(cmd: list[str]):
     """
     Run command in shell
     """
-    if split:
-        cmd = shlex.split(cmd)
-    return subprocess.run(cmd, shell=True)
+    return subprocess.run(cmd, check=True)
 
 
 def build_production(version):
-    run_cmd("pyinstaller run.spec --noconfirm", split=False)
+    run_cmd(["pyinstaller", "run.spec", "--noconfirm"])
     # copy plugin.json and SettingsTemplate.yaml to dist
     dist_dir = Path("dist/run")
     plugin_json = Path("plugin.json")
     settings_template = Path("SettingsTemplate.yaml")
+    assets_dir = Path("assets")
     shutil.copy(plugin_json, dist_dir)
     shutil.copy(settings_template, dist_dir)
+    shutil.copytree(assets_dir, dist_dir / "assets", dirs_exist_ok=True)
 
 
 parser = argparse.ArgumentParser(description="Build software.")
