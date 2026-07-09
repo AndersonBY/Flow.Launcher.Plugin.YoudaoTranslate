@@ -152,7 +152,6 @@ cython_debug/
 #.idea/
 
 config.json
-pdm.lock
 .pdm-python
 models/
 .vscode/settings.json

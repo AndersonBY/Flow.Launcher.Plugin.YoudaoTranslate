@@ -1,6 +1,6 @@
 [project]
 name = "flow-launcher-plugin-youdao-translate"
-version = "1.0.0"
+version = "1.0.1"
 description = "Youdao Translate plugin for Flow Launcher"
 authors = [
     {name = "Anderson", email = "andersonby@163.com"},
@@ -27,4 +27,4 @@ build-backend = "pdm.backend"
 
 
 [tool.pdm.scripts]
-build = "python build.py -v 0.0.29 -t p"
+build = "python build.py -v 1.0.1 -t production"

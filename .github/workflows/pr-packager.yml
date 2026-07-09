@@ -1,47 +1,48 @@
-name: "PR-Packager"
+name: PR Packager
+
 on:
   workflow_dispatch:
   pull_request:
+
 env:
-  PYTHON_VER: 3.8
+  PYTHON_VERSION: "3.12"
+  PACKAGE_NAME: Flow.Launcher.Plugin.YoudaoTranslate.zip
+
 jobs:
-  deps:
-    name: "Build"
+  build:
+    name: Build package
     runs-on: windows-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-      - name: Set up Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - uses: actions/cache@v2
-        if: startsWith(runner.os, 'Windows')
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: ${{ env.PYTHON_VERSION }}
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install wheel
-          pip install -r ./requirements.txt -t ./lib
-      - name: Get Plugin's version
-        id: version
-        uses: notiz-dev/github-action-json-property@release
-        with: 
-          path: 'plugin.json'
-          prop_path: 'Version'
-      - name: Package files
-        run: |
-          git clone https://github.com/Garulf/flow_commands/ bin
-          pip install -r ./bin/requirements.txt
-          python ./bin/commands.py package -n "${{github.event.repository.name}}.zip"
-      - name: Upload
-        uses: actions/upload-artifact@v2
+        run: python -m pip install --upgrade pdm
+
+      - name: Install project
+        run: pdm install -dG dev
+
+      - name: Lint
+        run: pdm run ruff check .
+
+      - name: Type check
+        run: pdm run ty check .
+
+      - name: Build executable plugin
+        run: pdm run python build.py -t production
+
+      - name: Pack zip
+        shell: pwsh
+        run: Compress-Archive -Path 'dist/run/*' -DestinationPath '${{ env.PACKAGE_NAME }}' -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: artifact
-          path: "./${{github.event.repository.name}}.zip"
+          name: ${{ env.PACKAGE_NAME }}
+          path: ${{ env.PACKAGE_NAME }}

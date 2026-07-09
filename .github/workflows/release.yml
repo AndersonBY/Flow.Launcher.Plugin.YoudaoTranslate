@@ -1,80 +1,73 @@
-# @Author: Bi Ying
-# @Date:   2022-08-02 20:03:15
-# @Last Modified by:   Bi Ying
-# @Last Modified time: 2022-08-03 12:07:47
-name: Build and Publish
+name: Publish Release
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
-    tags-ignore:
-      - 'v*'
-    paths-ignore: 
-      - .github/workflows/*
-      - README.md
-      - assets/*
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v1.0.1"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
 env:
-  PYTHON_VER: 3.8
+  PYTHON_VERSION: "3.12"
+  PACKAGE_NAME: Flow.Launcher.Plugin.YoudaoTranslate.zip
+
 jobs:
-  build-publish:
-    name: Build and Publish
+  build-release:
+    name: Build and publish release
     runs-on: windows-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-      - name: Set up Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - uses: actions/cache@v2
-        if: startsWith(runner.os, 'Windows')
-        with:
-          path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install PDM
+        run: python -m pip install --upgrade pdm
+
       - name: Install dependencies
+        run: pdm install -dG dev
+
+      - name: Check lock file
+        run: pdm lock -dG dev --check
+
+      - name: Lint
+        run: pdm run ruff check .
+
+      - name: Type check
+        run: pdm run ty check .
+
+      - name: Build executable plugin
+        run: pdm run python build.py -v "${{ github.ref_name }}" -t production
+
+      - name: Pack release zip
+        shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          pip install wheel click babel
-          pip install -r ./requirements.txt
+          if (Test-Path -LiteralPath '${{ env.PACKAGE_NAME }}') {
+            Remove-Item -LiteralPath '${{ env.PACKAGE_NAME }}' -Force
+          }
+          Compress-Archive -Path 'dist/run/*' -DestinationPath '${{ env.PACKAGE_NAME }}' -Force
 
-      - name: Install Dependencies to Local
-        run: pip install -r ./requirements.txt -t ./lib
-
-      - name: Update 'plugin.json' information
-        run: python commands.py gen-plugin-info
-
-      - name: Remove Python file artifacts
-        run: python commands.py clean-pyc
-
-      - name: Pack plugin to a zip file
-        run: python commands.py build
-
-      - name: get version
-        id: version
-        uses: notiz-dev/github-action-json-property@release
-        with: 
-          path: 'plugin.json'
-          prop_path: 'Version'
-      - run: echo ${{ steps.version.outputs.prop }} 
-
-      - name: Package files
-        run: |
-          git clone https://github.com/Garulf/flow_commands/ bin
-          pip install -r ./bin/requirements.txt
-          python ./bin/commands.py package -n "${{github.event.repository.name}}.zip"
-
-      - name: Publish
-        uses: softprops/action-gh-release@v1
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          draft: false
-          files: "./${{github.event.repository.name}}.zip"
-          tag_name: "v${{steps.version.outputs.prop}}"
+          name: ${{ env.PACKAGE_NAME }}
+          path: ${{ env.PACKAGE_NAME }}
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          files: ${{ env.PACKAGE_NAME }}
+          fail_on_unmatched_files: true
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
