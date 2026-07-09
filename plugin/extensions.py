@@ -9,6 +9,7 @@ translation = gettext.translation(
     "messages",
     TRANSLATIONS_PATH,
     languages=[LOCAL],
+    fallback=True,
 )
 
 _ = translation.gettext
