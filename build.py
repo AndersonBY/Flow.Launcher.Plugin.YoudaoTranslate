@@ -1,40 +1,98 @@
-# -*- coding: utf-8 -*-
-# @Author: Bi Ying
-# @Date:   2023-05-15 13:34:28
-# @Last Modified by:   Bi Ying
-# @Last Modified time: 2023-10-13 15:50:13
 import shutil
-import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 
-def run_cmd(cmd: list[str]):
-    """
-    Run command in shell
-    """
-    return subprocess.run(cmd, check=True)
-
-
-def build_production(version):
-    run_cmd(["pyinstaller", "run.spec", "--noconfirm"])
-    # copy plugin.json and SettingsTemplate.yaml to dist
-    dist_dir = Path("dist/run")
-    plugin_json = Path("plugin.json")
-    settings_template = Path("SettingsTemplate.yaml")
-    assets_dir = Path("assets")
-    shutil.copy(plugin_json, dist_dir)
-    shutil.copy(settings_template, dist_dir)
-    shutil.copytree(assets_dir, dist_dir / "assets", dirs_exist_ok=True)
-
-
-parser = argparse.ArgumentParser(description="Build software.")
-parser.add_argument("-v", "--version", default="0.0.1", help="version number, default: 0.0.1")
-parser.add_argument(
-    "-t", "--type", default="production", help="build type: development(d) or production(p) or frontend(f)"
+ROOT = Path(__file__).resolve().parent
+DIST_DIR = ROOT / "dist"
+PACKAGE_DIR = DIST_DIR / "run"
+PACKAGE_NAME = "Flow.Launcher.Plugin.YoudaoTranslate"
+RUNTIME_PATHS = (
+    "run.py",
+    "plugin",
+    "assets",
+    "translations",
+    "plugin.json",
+    "SettingsTemplate.yaml",
 )
-args = parser.parse_args()
-if args.type == "p" or args.type == "production":
-    build_production(args.version)
-elif args.type == "d" or args.type == "development":
-    pass
+
+
+def run_command(command: list[str]) -> None:
+    subprocess.run(command, cwd=ROOT, check=True)
+
+
+def copy_runtime_files() -> None:
+    for relative_path in RUNTIME_PATHS:
+        source = ROOT / relative_path
+        destination = PACKAGE_DIR / relative_path
+        if source.is_dir():
+            shutil.copytree(
+                source,
+                destination,
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
+            )
+        else:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+
+
+def install_runtime_dependencies() -> None:
+    requirements_path = DIST_DIR / "requirements.txt"
+    run_command(
+        [
+            "pdm",
+            "export",
+            "--prod",
+            "--without-hashes",
+            "--format",
+            "requirements",
+            "--output",
+            str(requirements_path),
+        ]
+    )
+    run_command(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--disable-pip-version-check",
+            "--ignore-installed",
+            "--no-compile",
+            "--no-warn-conflicts",
+            "--requirement",
+            str(requirements_path),
+            "--target",
+            str(PACKAGE_DIR / "lib"),
+        ]
+    )
+
+
+def remove_generated_files() -> None:
+    scripts_dir = PACKAGE_DIR / "lib" / "bin"
+    if scripts_dir.exists():
+        shutil.rmtree(scripts_dir)
+
+    for path in PACKAGE_DIR.rglob("__pycache__"):
+        shutil.rmtree(path)
+    for pattern in ("*.pyc", "*.pyo"):
+        for path in PACKAGE_DIR.rglob(pattern):
+            path.unlink()
+
+
+def build_source_package() -> Path:
+    if DIST_DIR.exists():
+        shutil.rmtree(DIST_DIR)
+    PACKAGE_DIR.mkdir(parents=True)
+
+    copy_runtime_files()
+    install_runtime_dependencies()
+    remove_generated_files()
+
+    archive = shutil.make_archive(str(DIST_DIR / PACKAGE_NAME), "zip", PACKAGE_DIR)
+    return Path(archive)
+
+
+if __name__ == "__main__":
+    print(build_source_package())

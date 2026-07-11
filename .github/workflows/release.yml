@@ -47,27 +47,19 @@ jobs:
       - name: Type check
         run: pdm run ty check .
 
-      - name: Build executable plugin
-        run: pdm run python build.py -v "${{ github.ref_name }}" -t production
-
-      - name: Pack release zip
-        shell: pwsh
-        run: |
-          if (Test-Path -LiteralPath '${{ env.PACKAGE_NAME }}') {
-            Remove-Item -LiteralPath '${{ env.PACKAGE_NAME }}' -Force
-          }
-          Compress-Archive -Path 'dist/run/*' -DestinationPath '${{ env.PACKAGE_NAME }}' -Force
+      - name: Build source plugin
+        run: python build.py
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PACKAGE_NAME }}
-          path: ${{ env.PACKAGE_NAME }}
+          path: dist/${{ env.PACKAGE_NAME }}
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          files: ${{ env.PACKAGE_NAME }}
+          files: dist/${{ env.PACKAGE_NAME }}
           fail_on_unmatched_files: true
           generate_release_notes: true

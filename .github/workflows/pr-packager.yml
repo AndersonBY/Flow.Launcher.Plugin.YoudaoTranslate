@@ -28,21 +28,20 @@ jobs:
       - name: Install project
         run: pdm install -dG dev
 
+      - name: Check lock file
+        run: pdm lock -dG dev --check
+
       - name: Lint
         run: pdm run ruff check .
 
       - name: Type check
         run: pdm run ty check .
 
-      - name: Build executable plugin
-        run: pdm run python build.py -t production
-
-      - name: Pack zip
-        shell: pwsh
-        run: Compress-Archive -Path 'dist/run/*' -DestinationPath '${{ env.PACKAGE_NAME }}' -Force
+      - name: Build source plugin
+        run: python build.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PACKAGE_NAME }}
-          path: ${{ env.PACKAGE_NAME }}
+          path: dist/${{ env.PACKAGE_NAME }}

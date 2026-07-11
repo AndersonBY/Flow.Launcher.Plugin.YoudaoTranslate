@@ -3,13 +3,15 @@
 # @Date:   2022-08-02 20:03:15
 # @Last Modified by:   Bi Ying
 # @Last Modified time: 2023-10-13 15:12:59
-import sys
 import os
+import sys
+from pathlib import Path
 
 
 def main():
-    plugin_root = sys.argv[0]
-    os.chdir(os.path.dirname(os.path.abspath(plugin_root)))
+    plugin_root = Path(__file__).resolve().parent
+    sys.path.insert(0, str(plugin_root / "lib"))
+    os.chdir(plugin_root)
 
     from plugin.main import YoudaoTranslate
 

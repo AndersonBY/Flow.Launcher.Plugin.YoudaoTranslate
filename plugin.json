@@ -7,12 +7,12 @@
     "Name": "YoudaoTranslate",
     "Description": "Translate between any languages supported by Youdao",
     "Author": "AndersonBY",
-    "Version": "1.0.2",
-    "Language": "executable",
+    "Version": "1.0.3",
+    "Language": "python",
     "SearchDelayTime": 350,
     "Website": "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate",
     "IcoPath": "assets\\favicon.ico",
-    "ExecuteFileName": "run.exe",
-    "UrlDownload": "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate/releases/download/v1.0.2/Flow.Launcher.Plugin.YoudaoTranslate.zip",
+    "ExecuteFileName": "run.py",
+    "UrlDownload": "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate/releases/download/v1.0.3/Flow.Launcher.Plugin.YoudaoTranslate.zip",
     "UrlSourceCode": "https://github.com/AndersonBY/Flow.Launcher.Plugin.YoudaoTranslate"
 }

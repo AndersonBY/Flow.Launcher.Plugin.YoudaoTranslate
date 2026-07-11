@@ -47,5 +47,11 @@ jobs:
           $request = @{ method = 'query'; parameters = @('ci-smoke') } | ConvertTo-Json -Compress
           pdm run python run.py $request
 
-      - name: Build executable plugin
-        run: pdm run python build.py -t production
+      - name: Build source plugin
+        run: python build.py
+
+      - name: Smoke test packaged entrypoint
+        shell: pwsh
+        run: |
+          $request = @{ method = 'query'; parameters = @('package-smoke') } | ConvertTo-Json -Compress
+          python dist/run/run.py $request
